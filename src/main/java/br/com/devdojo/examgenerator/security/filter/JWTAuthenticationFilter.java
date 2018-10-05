@@ -22,41 +22,36 @@ import java.util.Date;
 
 import static br.com.devdojo.examgenerator.security.filter.Constants.*;
 
-public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private AuthenticationManager authenticationManager; //responsável por fazer a  autenticação do framework spring security
+public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
+
+       private AuthenticationManager authenticationManager;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
 
-    @Override //autenticação
+    @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try{
-            ApplicationUser user = new ObjectMapper().readValue(request.getInputStream(), ApplicationUser.class);
-            return authenticationManager.
-                    authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+            ApplicationUser user = new ObjectMapper().readValue(request.getInputStream(),  ApplicationUser.class);
+            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
         }catch (IOException e){
-                throw new RuntimeException(e);
+            throw  new RuntimeException(e);
         }
     }
 
-    @Override //token
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-            FilterChain chain, Authentication authResult) throws IOException,
-            ServletException {
-            ZonedDateTime expTimeUTC = ZonedDateTime.now(ZoneOffset.UTC).plus(EXPIRATION_TIME, ChronoUnit.MILLIS);
-            String token = Jwts.builder()
-                .setSubject(((ApplicationUser)authResult.getPrincipal()).getUsername())
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+        ZonedDateTime expTimeUTC = ZonedDateTime.now(ZoneOffset.UTC).plus(EXPIRATION_TIME, ChronoUnit.MILLIS);
+        String token = Jwts.builder().setSubject(((ApplicationUser) authResult.getPrincipal()).getUsername())
                 .setExpiration(Date.from(expTimeUTC.toInstant()))
                 .signWith(SignatureAlgorithm.HS256, SECRET)
                 .compact();
-
-            token = TOKEN_PREFIX + token;
-            String tokenJson = "{\"token\":" + addQuotes(token)
-                    + ",\"exp\":" + addQuotes(expTimeUTC.toString())+"}";
-            response.getWriter().write(tokenJson);
-            response.addHeader("Content-Type", "application/json;charset=UTF-8");
-            response.addHeader(HEADER_STRING, token);
+        token = TOKEN_PREFIX + token;
+        String tokenJson = "{\"token\":"+addQuotes(token)+",\"exp\":"+addQuotes(expTimeUTC.toString())+"}";
+        response.getWriter().write(tokenJson);
+        response.addHeader("Content-Type","application/json;charset=UTF-8");
+        response.addHeader(HEADER_STRING, token);
     }
 
     private String addQuotes(String value){

@@ -15,10 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static br.com.devdojo.examgenerator.security.filter.Constants.*;
+import static br.com.devdojo.examgenerator.security.filter.Constants.HEADER_STRING;
+import static br.com.devdojo.examgenerator.security.filter.Constants.SECRET;
+import static br.com.devdojo.examgenerator.security.filter.Constants.TOKEN_PREFIX;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
-    private CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     public JWTAuthorizationFilter(AuthenticationManager authenticationManager,
                                   CustomUserDetailsService customUserDetailsService) {
@@ -27,9 +29,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response, FilterChain chain)
-                                    throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
         String header = request.getHeader(HEADER_STRING);
         if (header == null || !header.startsWith(TOKEN_PREFIX)) {
             chain.doFilter(request, response);
@@ -43,15 +44,13 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     private UsernamePasswordAuthenticationToken getAuthenticationToken(HttpServletRequest request) {
         String token = request.getHeader(HEADER_STRING);
         if (token == null) return null;
-        String username;
-        username = Jwts.parser().setSigningKey(SECRET)
+        String username = Jwts.parser().setSigningKey(SECRET)
                 .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                 .getBody()
                 .getSubject();
+
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
         ApplicationUser applicationUser = customUserDetailsService.loadApplicationUserByUserName(username);
-
-        return username != null ? new UsernamePasswordAuthenticationToken(applicationUser,
-                null, userDetails.getAuthorities()) : null;
+        return username != null ? new UsernamePasswordAuthenticationToken(applicationUser, null, userDetails.getAuthorities()) : null;
     }
 }
