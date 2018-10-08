@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("v1/professor/course")
 @Api(description = "Operações relacionadas aos professores do curso")
@@ -45,10 +47,12 @@ public class CourseEndpoint {
 
     }
 
-
     @ApiOperation(value = "Deletar o curso especificado e retonar 200 Ok sem o corpo")
     @DeleteMapping(path = "{id}")
-    public ResponseEntity<?> delete(@PathVariable Course id) {
+    public ResponseEntity<?> delete(@PathVariable long id) {
+        Optional<Course> course = courseRepository.findById(id);
+        if(!course.isPresent())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         courseRepository.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
