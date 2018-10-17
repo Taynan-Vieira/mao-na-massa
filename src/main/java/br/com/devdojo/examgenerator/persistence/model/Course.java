@@ -31,6 +31,9 @@ public class Course extends AbstractEntity {
         this.professor = professor;
     }
 
+    public void setId(long l) {
+    }
+
     public static final class Builder {
         private Course course;
 

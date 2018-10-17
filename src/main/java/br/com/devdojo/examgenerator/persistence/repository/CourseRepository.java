@@ -11,7 +11,8 @@ import java.util.Optional;
 
 public interface CourseRepository extends PagingAndSortingRepository<Course, Long> {
     @Query("select c from Course c where  c.id = ?1 and c.professor = ?#{principal.professor}")
-    Optional<Course> findById(Long id);
+//    Optional<Course> findById(Long id);
+    Course findBy(Long id);
 
     @Query("select c from Course c where c = ?1 and c.professor = ?#{principal.professor}")
     Course findBy(Course course);

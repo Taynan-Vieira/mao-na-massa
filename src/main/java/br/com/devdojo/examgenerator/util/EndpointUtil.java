@@ -16,7 +16,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Service
 public class EndpointUtil implements Serializable {
     public ResponseEntity<?> returnObjectOrNotFound(Object object){
-        return object == null ? new ResponseEntity<>(NOT_FOUND) : new ResponseEntity<>(object, HttpStatus.NOT_FOUND);
+        return object == null ? new ResponseEntity<>(NOT_FOUND) : new ResponseEntity<>(object, HttpStatus.OK);
     }
 
     public ResponseEntity<?> returnObjectOrNotFound(List<?> list){

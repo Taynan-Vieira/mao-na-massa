@@ -34,9 +34,10 @@ public class CourseEndpoint {
     @GetMapping(path = "{id}")
     public ResponseEntity<?> getCourseById(@PathVariable long id) {
         return endpointUtil.returnObjectOrNotFound(courseRepository.findById(id));
+
         /*Optional<Course> course = courseRepository.findById(id);
-        if(!course.isPresent()) //Importante*/
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(!course.isPresent()) //Importante
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);*/
 
     }
 
