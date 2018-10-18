@@ -1,6 +1,5 @@
 package br.com.devdojo.examgenerator.v1.course;
 
-import br.com.devdojo.examgenerator.persistence.model.ApplicationUser;
 import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.repository.CourseRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
@@ -10,7 +9,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -21,11 +19,13 @@ import java.util.Optional;
 @Api(description = "Operações relacionadas aos professores do curso")
 public class CourseEndpoint {
     private final CourseRepository courseRepository;
+    private final CourseService courseService;
     private EndpointUtil endpointUtil = new EndpointUtil();
 
     @Autowired
-    public CourseEndpoint(CourseRepository courseRepository, EndpointUtil endpointUtil) {
+    public CourseEndpoint(CourseRepository courseRepository, CourseService courseService, EndpointUtil endpointUtil) {
         this.courseRepository = courseRepository;
+        this.courseService = courseService;
         this.endpointUtil = endpointUtil;
     }
 
@@ -48,26 +48,22 @@ public class CourseEndpoint {
 
     }
 
-    @ApiOperation(value = "Deletar o curso especificado e retonar 200 Ok sem o corpo")
+    @ApiOperation(value = "Deletar o curso especificado e retonar 200 Ok")
     @DeleteMapping(path = "{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
-        Optional<Course> course = courseRepository.findById(id);
-        if (!course.isPresent())
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else
-            courseRepository.delete(id);
+        courseService.throwResourceNotFoundIfCourseNotExist(courseRepository.findBy(id));
+        courseRepository.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    /*@ApiOperation(value = "Atualizar curso especificado e retonar 200 Ok sem o corpo")
+
+    @ApiOperation(value = "Atualizar o curso especificado e retonar 200 Ok")
     @PutMapping
-    public ResponseEntity<?> delete(@RequestBody Course course) {
-        Optional<Course>  Course = courseRepository.findAll(course);
-        if(!course.isPresent())
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else
-            courseRepository.save();
-        return new ResponseEntity<>(HttpStatus.OK);
-    }*/
+    public ResponseEntity<?> update(@RequestBody Course course) {
+        courseService.throwResourceNotFoundIfCourseNotExist(courseRepository.findBy(course));
+        /*courseRepository.save(course);
+        return new ResponseEntity<>(HttpStatus.OK);*/
+        return new ResponseEntity<>(courseRepository.save(course), HttpStatus.OK);
+    }
 
     @ApiOperation(value = "Criar o curso especificado e retonar o curso criado")
     @PostMapping

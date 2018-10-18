@@ -2,7 +2,9 @@ package br.com.devdojo.examgenerator.persistence.model;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotEmpty;
 
