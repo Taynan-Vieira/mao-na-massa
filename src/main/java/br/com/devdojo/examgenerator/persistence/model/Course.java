@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotEmpty;
 
@@ -14,7 +13,7 @@ public class Course extends AbstractEntity {
     @NotEmpty(message = "O nome do curso não pode estar vazio")
     @ApiModelProperty(notes = "O nome do curso")
     private String name;
-    @ManyToOne(optional = false)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Professor professor;
 
     public String getName() {
@@ -33,8 +32,8 @@ public class Course extends AbstractEntity {
         this.professor = professor;
     }
 
-    public void setId(long l) {
-    }
+//    public void setId(long id) {
+//    }
 
     public static final class Builder {
         private Course course;
