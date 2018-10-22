@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpMethod.POST;
@@ -65,7 +64,7 @@ public class CourseEndpointTest {
     public void setup() {
         BDDMockito.when(courseRepository.findBy(course.getId())).thenReturn(course);
         BDDMockito.when(courseRepository.listCourses("")).thenReturn(Collections.singletonList(course));
-        BDDMockito.when(courseRepository.listCourses("java")).thenReturn(Collections.singletonList(course));
+        BDDMockito.when(courseRepository.listCourses("JAVA")).thenReturn(Collections.singletonList(course));
     }
 
     @Test
@@ -86,6 +85,7 @@ public class CourseEndpointTest {
         assertThat(exchange.getStatusCodeValue()).isEqualTo(404);
     }
 
+    @Test
     public void listAllCoursesWhenNameExistsShouldReturn200() throws Exception{
         ResponseEntity<String> exchange =  testRestTemplate.exchange("/v1/professor/course/list?name=xaxa", HttpMethod.GET, professorHeader, String.class);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(200);
@@ -141,6 +141,6 @@ public class CourseEndpointTest {
 
     private ResponseEntity<String> createCourse(Course course){
         BDDMockito.when(courseRepository.save(course)).thenReturn(course);
-        return testRestTemplate.exchange("v1/professor/course/", POST, new HttpEntity<>(course, professorHeader.getHeaders()), String.class);
+        return testRestTemplate.exchange("/v1/professor/course/", POST, new HttpEntity<>(course, professorHeader.getHeaders()), String.class);
     }
 }

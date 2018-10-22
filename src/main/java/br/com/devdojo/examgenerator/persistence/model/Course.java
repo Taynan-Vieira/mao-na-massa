@@ -13,7 +13,7 @@ public class Course extends AbstractEntity {
     @NotEmpty(message = "O nome do curso não pode estar vazio")
     @ApiModelProperty(notes = "O nome do curso")
     private String name;
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(optional = false)
     private Professor professor;
 
     public String getName() {
