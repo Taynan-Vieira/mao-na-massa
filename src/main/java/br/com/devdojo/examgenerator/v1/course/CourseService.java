@@ -17,8 +17,18 @@ public class CourseService implements Serializable {
         this.courseRepository = courseRepository;
     }
 
-    public void throwResourceNotFoundIfCourseNotExist(Course course){
-        if(course == null || course.getId() == null || courseRepository.findBy(course.getId()) == null)
+    public void throwResourceNotFoundIfCourseNotExist(Course course) {
+        if (course.getId() == null || course.getName().trim().isEmpty())
+            throw new ResourceNotFoundException("O nome do campo não pode ser vazio");
+
+        if (course == null || course.getId() == null || courseRepository.findBy(course.getId()) == null)
             throw new ResourceNotFoundException("Course not found");
     }
+
+
+/*
+    public void throwFieldNameCanNotBeEmpty(Course name){
+
+
+    }*/
 }

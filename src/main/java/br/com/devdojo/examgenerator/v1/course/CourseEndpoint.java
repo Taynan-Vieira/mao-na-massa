@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import javax.validation.Valid;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("v1/professor/course")
@@ -20,7 +20,7 @@ import java.util.Optional;
 public class CourseEndpoint {
     private final CourseRepository courseRepository;
     private final CourseService courseService;
-    private EndpointUtil endpointUtil = new EndpointUtil();
+    private EndpointUtil endpointUtil;
 
     @Autowired
     public CourseEndpoint(CourseRepository courseRepository, CourseService courseService, EndpointUtil endpointUtil) {
@@ -33,18 +33,16 @@ public class CourseEndpoint {
     @ApiOperation(value = "Retornar um curso com base em s eu id", response = Course.class)
     @GetMapping(path = "{id}")
     public ResponseEntity<?> getCourseById(@PathVariable long id) {
-        return endpointUtil.returnObjectOrNotFound(courseRepository.findById(id));
-
+        return endpointUtil.returnObjectOrNotFound(courseRepository.findBy(id));
         /*Optional<Course> course = courseRepository.findById(id);
         if(!course.isPresent()) //Importante
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);*/
-
     }
 
     @ApiOperation(value = "Retornar a lista dos cursos  relacionados ao professor", response = Course.class)
     @GetMapping(path = "list")
     public ResponseEntity<?> listCourses(@ApiParam("Course name") @RequestParam(value = "name", defaultValue = "") String name) {
-        return endpointUtil.returnObjectOrNotFound(courseRepository.listCourses(name));
+        return new ResponseEntity<>(courseRepository.listCourses(name), HttpStatus.OK);
 
     }
 
@@ -60,8 +58,6 @@ public class CourseEndpoint {
     @PutMapping
     public ResponseEntity<?> update(@RequestBody Course course) {
         courseService.throwResourceNotFoundIfCourseNotExist(courseRepository.findBy(course));
-        /*courseRepository.save(course);
-        return new ResponseEntity<>(HttpStatus.OK);*/
         return new ResponseEntity<>(courseRepository.save(course), HttpStatus.OK);
     }
 

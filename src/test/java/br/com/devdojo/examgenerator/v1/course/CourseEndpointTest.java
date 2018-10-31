@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpMethod.POST;
@@ -50,7 +52,7 @@ public class CourseEndpointTest {
     public void configProfessorHeader() {
         String body = "{\"username\":\"taynan\",\"password\":\"devdojo\"}";
         HttpHeaders headers = testRestTemplate.postForEntity("/login", body, String.class).getHeaders();
-        this.professorHeader  = new HttpEntity<>(headers);
+        this.professorHeader = new HttpEntity<>(headers);
     }
 
     @Before
@@ -68,78 +70,79 @@ public class CourseEndpointTest {
     }
 
     @Test
-    public void getCourseByIdWhenTokenIsWrongShouldReturn403() throws Exception{
-        ResponseEntity<String> exchange =  testRestTemplate.exchange("/v1/professor/course/1", HttpMethod.GET, wrongHeader, String.class);
+    public void getCourseByIdWhenTokenIsWrongShouldReturn403() throws Exception {
+        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/1", HttpMethod.GET, wrongHeader, String.class);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(403);
     }
 
     @Test
-    public void listCoursesWhenTokenIsWrongShouldReturn403() throws Exception{
-        ResponseEntity<String> exchange =  testRestTemplate.exchange("/v1/professor/course/list?name=", HttpMethod.GET, wrongHeader, String.class);
+    public void listCoursesWhenTokenIsWrongShouldReturn403() throws Exception {
+        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/list?name=", HttpMethod.GET, wrongHeader, String.class);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(403);
     }
 
     @Test
-    public void listAllCoursesWhenNameDoesNotExistsShouldReturn404() throws Exception{
-        ResponseEntity<String> exchange =  testRestTemplate.exchange("/v1/professor/course/list?name=xaxa",  HttpMethod.GET, professorHeader, String.class);
-        assertThat(exchange.getStatusCodeValue()).isEqualTo(404);
+    public void listAllCoursesWhenNameDoesNotExistsShouldReturnEmptyList() throws Exception {
+        ResponseEntity<List<Course>> exchange = testRestTemplate.exchange("/v1/professor/course/list?name=xaxa", HttpMethod.GET, professorHeader, new ParameterizedTypeReference<List<Course>>() {
+        });
+        assertThat(exchange.getBody()).isEmpty();
     }
 
     @Test
-    public void listAllCoursesWhenNameExistsShouldReturn200() throws Exception{
-        ResponseEntity<String> exchange =  testRestTemplate.exchange("/v1/professor/course/list?name=xaxa", HttpMethod.GET, professorHeader, String.class);
+    public void listAllCoursesWhenNameExistsShouldReturn200() throws Exception {
+        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/list?name=xaxa", HttpMethod.GET, professorHeader, String.class);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(200);
     }
 
     @Test
-    public void getCourseByIdWithouthIdShouldReturn400() throws Exception{
-        ResponseEntity<String> exchange =  testRestTemplate.exchange("/v1/professor/course/", HttpMethod.GET, professorHeader, String.class);
+    public void getCourseByIdWithouthIdShouldReturn400() throws Exception {
+        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/", HttpMethod.GET, professorHeader, String.class);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(400);
     }
 
     @Test
-    public void getCourseByIdWhenCourseIdDoesNotExistsShouldReturn404() throws Exception{
-        ResponseEntity<String> exchange =  testRestTemplate.exchange("/v1/professor/course/-1", HttpMethod.GET, professorHeader, String.class);
+    public void getCourseByIdWhenCourseIdDoesNotExistsShouldReturn404() throws Exception {
+        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/-1", HttpMethod.GET, professorHeader, String.class);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(404);
     }
 
     @Test
-    public void getCourseByIdWhenCourseExitsShouldReturn200() throws Exception{
-        ResponseEntity<String> exchange =  testRestTemplate.exchange("/v1/professor/course/1", HttpMethod.GET, professorHeader, String.class);
+    public void getCourseByIdWhenCourseExitsShouldReturn200() throws Exception {
+        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/1", HttpMethod.GET, professorHeader, String.class);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(200);
     }
 
     @Test
-    public void deleteCourseWhenIdExistsShouldReturn200() throws Exception{
+    public void deleteCourseWhenIdExistsShouldReturn200() throws Exception {
         long id = 1L;
         BDDMockito.doNothing().when(courseRepository).delete(id);
-        ResponseEntity<String> exchange =  testRestTemplate.exchange("/v1/professor/course/{id}", HttpMethod.GET, professorHeader, String.class, id);
+        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/{id}", HttpMethod.GET, professorHeader, String.class, id);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(200);
     }
 
     @Test
-    public void deleteCourseWhenIdDoesNotExistsShouldReturn404() throws Exception{
+    public void deleteCourseWhenIdDoesNotExistsShouldReturn404() throws Exception {
         long id = -1L;
         BDDMockito.doNothing().when(courseRepository).delete(id);
-        ResponseEntity<String> exchange =  testRestTemplate.exchange("/v1/professor/course/{id}", HttpMethod.GET, professorHeader, String.class, id);
+        ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/{id}", HttpMethod.GET, professorHeader, String.class, id);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(404);
     }
 
     @Test
-    public void createCourseWhenNameIsNullShouldReturn400() throws Exception{
+    public void createCourseWhenNameIsNullShouldReturn400() throws Exception {
         Course course = courseRepository.findBy(1L);
         course.setName(null);
         assertThat(createCourse(course).getStatusCodeValue()).isEqualTo(400);
     }
 
     @Test
-    public void createCourseWhenEverythingIsRightShouldReturn200() throws Exception{
+    public void createCourseWhenEverythingIsRightShouldReturn200() throws Exception {
         Course course = courseRepository.findBy(1L);
         course.setId(Long.parseLong(null));
         assertThat(createCourse(course).getStatusCodeValue()).isEqualTo(200);
     }
 
-    private ResponseEntity<String> createCourse(Course course){
+    private ResponseEntity<String> createCourse(Course course) {
         BDDMockito.when(courseRepository.save(course)).thenReturn(course);
         return testRestTemplate.exchange("/v1/professor/course/", POST, new HttpEntity<>(course, professorHeader.getHeaders()), String.class);
     }
