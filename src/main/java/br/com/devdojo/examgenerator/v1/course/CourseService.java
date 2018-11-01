@@ -25,10 +25,4 @@ public class CourseService implements Serializable {
             throw new ResourceNotFoundException("Course not found");
     }
 
-
-/*
-    public void throwFieldNameCanNotBeEmpty(Course name){
-
-
-    }*/
 }

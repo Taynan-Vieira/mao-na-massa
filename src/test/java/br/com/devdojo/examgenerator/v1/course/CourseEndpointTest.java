@@ -65,8 +65,8 @@ public class CourseEndpointTest {
     @Before
     public void setup() {
         BDDMockito.when(courseRepository.findBy(course.getId())).thenReturn(course);
-        BDDMockito.when(courseRepository.listCourses("")).thenReturn(Collections.singletonList(course));
-        BDDMockito.when(courseRepository.listCourses("JAVA")).thenReturn(Collections.singletonList(course));
+        BDDMockito.when(courseRepository.listCoursesByName("")).thenReturn(Collections.singletonList(course));
+        BDDMockito.when(courseRepository.listCoursesByName("JAVA")).thenReturn(Collections.singletonList(course));
     }
 
     @Test
@@ -115,7 +115,7 @@ public class CourseEndpointTest {
     @Test
     public void deleteCourseWhenIdExistsShouldReturn200() throws Exception {
         long id = 1L;
-        BDDMockito.doNothing().when(courseRepository).delete(id);
+        BDDMockito.doNothing().when(courseRepository).deleteById(id);
         ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/{id}", HttpMethod.GET, professorHeader, String.class, id);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(200);
     }
@@ -123,7 +123,7 @@ public class CourseEndpointTest {
     @Test
     public void deleteCourseWhenIdDoesNotExistsShouldReturn404() throws Exception {
         long id = -1L;
-        BDDMockito.doNothing().when(courseRepository).delete(id);
+        BDDMockito.doNothing().when(courseRepository).deleteById(id);
         ResponseEntity<String> exchange = testRestTemplate.exchange("/v1/professor/course/{id}", HttpMethod.GET, professorHeader, String.class, id);
         assertThat(exchange.getStatusCodeValue()).isEqualTo(404);
     }

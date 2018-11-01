@@ -42,7 +42,7 @@ public class CourseEndpoint {
     @ApiOperation(value = "Retornar a lista dos cursos  relacionados ao professor", response = Course.class)
     @GetMapping(path = "list")
     public ResponseEntity<?> listCourses(@ApiParam("Course name") @RequestParam(value = "name", defaultValue = "") String name) {
-        return new ResponseEntity<>(courseRepository.listCourses(name), HttpStatus.OK);
+        return new ResponseEntity<>(courseRepository.listCoursesByName(name), HttpStatus.OK);
 
     }
 
@@ -50,16 +50,18 @@ public class CourseEndpoint {
     @DeleteMapping(path = "{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
         courseService.throwResourceNotFoundIfCourseNotExist(courseRepository.findBy(id));
-        courseRepository.delete(id);
+        courseRepository.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /********************************************/
     @ApiOperation(value = "Atualizar o curso especificado e retonar 200 Ok")
     @PutMapping
     public ResponseEntity<?> update(@RequestBody Course course) {
         courseService.throwResourceNotFoundIfCourseNotExist(courseRepository.findBy(course));
         return new ResponseEntity<>(courseRepository.save(course), HttpStatus.OK);
     }
+    /********************************************/
 
     @ApiOperation(value = "Criar o curso especificado e retonar o curso criado")
     @PostMapping

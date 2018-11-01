@@ -11,6 +11,9 @@ public class AbstractEntity implements Serializable  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(columnDefinition = "boolean default true")
+    private boolean enabled = true;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -22,6 +25,14 @@ public class AbstractEntity implements Serializable  {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public Long getId() {

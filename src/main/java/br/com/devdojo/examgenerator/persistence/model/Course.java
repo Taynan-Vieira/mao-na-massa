@@ -3,6 +3,7 @@ package br.com.devdojo.examgenerator.persistence.model;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotEmpty;
@@ -31,9 +32,6 @@ public class Course extends AbstractEntity {
     public void setProfessor(Professor professor) {
         this.professor = professor;
     }
-
-//    public void setId(long id) {
-//    }
 
     public static final class Builder {
         private Course course;
