@@ -1,5 +1,6 @@
-package br.com.devdojo.examgenerator.v1.course;
+package br.com.devdojo.examgenerator.endpoint.v1.course;
 
+import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.repository.CourseRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
@@ -13,19 +14,20 @@ import org.springframework.web.bind.annotation.*;
 
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("v1/professor/course")
 @Api(description = "Operações relacionadas aos professores do curso")
 public class CourseEndpoint {
     private final CourseRepository courseRepository;
-    private final CourseService courseService;
+    private final GenericService service;
     private EndpointUtil endpointUtil;
 
     @Autowired
-    public CourseEndpoint(CourseRepository courseRepository, CourseService courseService, EndpointUtil endpointUtil) {
+    public CourseEndpoint(CourseRepository courseRepository, GenericService service, EndpointUtil endpointUtil) {
         this.courseRepository = courseRepository;
-        this.courseService = courseService;
+        this.service = service;
         this.endpointUtil = endpointUtil;
     }
 
@@ -34,22 +36,30 @@ public class CourseEndpoint {
     @GetMapping(path = "{id}")
     public ResponseEntity<?> getCourseById(@PathVariable long id) {
         return endpointUtil.returnObjectOrNotFound(courseRepository.findBy(id));
-        /*Optional<Course> course = courseRepository.findById(id);
-        if(!course.isPresent()) //Importante
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);*/
+    }
+
+    @ApiOperation(value = "Retornar data de criação dos cursos", response = Course.class)
+    @GetMapping(path = "listDateCreationCourse/{id}")
+    public ResponseEntity<?> listDateCreationCourses(@RequestParam(value = "dateCreation", defaultValue = "") LocalDate listDateCreation) {
+        return new ResponseEntity<>(courseRepository.listDateCreationCourses(listDateCreation), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Retornar data de eventos dos cursos", response = Course.class)
+    @GetMapping(path = "listDateEventCourse/{id}")
+    public ResponseEntity<?> listDateEventCourses(@RequestParam(value = "dateEvent", defaultValue = "") LocalDate listDateEvent) {
+        return new ResponseEntity<>(courseRepository.listDateEventCourses(listDateEvent), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Retornar a lista dos cursos  relacionados ao professor", response = Course.class)
     @GetMapping(path = "list")
     public ResponseEntity<?> listCourses(@ApiParam("Course name") @RequestParam(value = "name", defaultValue = "") String name) {
         return new ResponseEntity<>(courseRepository.listCoursesByName(name), HttpStatus.OK);
-
     }
 
     @ApiOperation(value = "Deletar o curso especificado e retonar 200 Ok")
     @DeleteMapping(path = "{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
-        courseService.throwResourceNotFoundIfCourseNotExist(courseRepository.findBy(id));
+        service.throwResourceNotFoundIfDoesNotExist(id, courseRepository, "Course not found");
         courseRepository.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -58,9 +68,10 @@ public class CourseEndpoint {
     @ApiOperation(value = "Atualizar o curso especificado e retonar 200 Ok")
     @PutMapping
     public ResponseEntity<?> update(@RequestBody Course course) {
-        courseService.throwResourceNotFoundIfCourseNotExist(courseRepository.findBy(course));
+        service.throwResourceNotFoundIfDoesNotExist(course, courseRepository, "Course not found");
         return new ResponseEntity<>(courseRepository.save(course), HttpStatus.OK);
     }
+
     /********************************************/
 
     @ApiOperation(value = "Criar o curso especificado e retonar o curso criado")

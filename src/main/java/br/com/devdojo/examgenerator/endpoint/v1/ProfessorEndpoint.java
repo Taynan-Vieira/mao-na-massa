@@ -1,4 +1,4 @@
-package br.com.devdojo.examgenerator.v1;
+package br.com.devdojo.examgenerator.endpoint.v1;
 
 import br.com.devdojo.examgenerator.persistence.model.Professor;
 import br.com.devdojo.examgenerator.persistence.repository.ProfessorRepository;

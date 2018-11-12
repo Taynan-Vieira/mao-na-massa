@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface CourseRepository extends CustomPagingAndSortRepository<Course, Long> {
@@ -22,4 +23,9 @@ public interface CourseRepository extends CustomPagingAndSortRepository<Course, 
     @Query("delete from Course c where c = ?1 and c.professor = ?#{principal.professor}")
     void delete(Course course);
 
+    @Query("select c from Course c where c.dateCreation like %?1% and c.professor = ?#{principal.professor}")
+    List<Course> listDateCreationCourses(LocalDate dateCreation);
+
+    @Query("select c from Course c where c.dateEvent like %?1% and c.professor = ?#{principal.professor}")
+    List<Course> listDateEventCourses(LocalDate dateEvent);
 }

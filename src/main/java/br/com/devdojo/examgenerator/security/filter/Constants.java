@@ -14,6 +14,8 @@ public class Constants {
     public static void main(String[] args){
         System.out.println(TimeUnit.MILLISECONDS.convert( 1, TimeUnit.DAYS));
         System.out.println(new BCryptPasswordEncoder().encode("devdojo"));
+
+
     }
 }
 

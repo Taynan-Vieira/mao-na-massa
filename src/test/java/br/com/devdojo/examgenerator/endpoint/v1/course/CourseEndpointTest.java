@@ -1,9 +1,9 @@
-package br.com.devdojo.examgenerator.v1.course;
+package br.com.devdojo.examgenerator.endpoint.v1.course;
 
 import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.repository.CourseRepository;
 import br.com.devdojo.examgenerator.persistence.repository.ProfessorRepository;
-import br.com.devdojo.examgenerator.v1.ProfessorEndpointTest;
+import br.com.devdojo.examgenerator.endpoint.v1.ProfessorEndpointTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +40,7 @@ public class CourseEndpointTest {
     private HttpEntity<Void> wrongHeader;
     private Course course = mockCourse();
 
-    private static Course mockCourse() {
+    public static Course mockCourse() {
         return Course.Builder.newCourse()
                 .withId(1L)
                 .withName("React")
