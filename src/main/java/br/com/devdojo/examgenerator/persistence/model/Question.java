@@ -11,9 +11,9 @@ public class Question extends AbstractEntity {
     @NotEmpty(message = "O nome título não pode estar vazio")
     @ApiModelProperty(notes = "O título da questão")
     private String title;
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Course course;
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Professor professor;
 
     public static final class Builder {

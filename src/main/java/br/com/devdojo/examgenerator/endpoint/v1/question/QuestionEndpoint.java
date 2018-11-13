@@ -2,6 +2,7 @@ package br.com.devdojo.examgenerator.endpoint.v1.question;
 
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Question;
+import br.com.devdojo.examgenerator.persistence.repository.CourseRepository;
 import br.com.devdojo.examgenerator.persistence.repository.QuestionRepository;
 import br.com.devdojo.examgenerator.util.EndpointUtil;
 import io.swagger.annotations.Api;
@@ -19,12 +20,15 @@ import javax.validation.Valid;
 @Api(description = "Operações relacionadas as questões do curso")
 public class QuestionEndpoint {
     private final QuestionRepository questionRepository;
+    private final CourseRepository courseRepository;
+
     private final GenericService service;
     private EndpointUtil endpointUtil;
 
     @Autowired
-    public QuestionEndpoint(QuestionRepository questionRepository, GenericService service, EndpointUtil endpointUtil) {
+    public QuestionEndpoint(QuestionRepository questionRepository, CourseRepository courseRepository, GenericService service, EndpointUtil endpointUtil) {
         this.questionRepository = questionRepository;
+        this.courseRepository = courseRepository;
         this.service = service;
         this.endpointUtil = endpointUtil;
     }
@@ -65,6 +69,7 @@ public class QuestionEndpoint {
     @ApiOperation(value = "Criar a questão especificada e retonar a questão criada")
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody Question question) {
+        service.throwResourceNotFoundIfDoesNotExist(question.getCourse(), courseRepository, "Course not found");
         question.setProfessor(endpointUtil.extractProfessorFromToken());
         return new ResponseEntity<>(questionRepository.save(question), HttpStatus.OK);
     }
