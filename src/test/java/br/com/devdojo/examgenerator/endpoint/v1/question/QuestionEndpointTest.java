@@ -2,6 +2,7 @@ package br.com.devdojo.examgenerator.endpoint.v1.question;
 
 import br.com.devdojo.examgenerator.endpoint.v1.ProfessorEndpointTest;
 import br.com.devdojo.examgenerator.endpoint.v1.course.CourseEndpointTest;
+import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.model.Question;
 import br.com.devdojo.examgenerator.persistence.repository.ProfessorRepository;
 import br.com.devdojo.examgenerator.persistence.repository.QuestionRepository;
@@ -135,6 +136,13 @@ public class QuestionEndpointTest {
         Question question = questionRepository.findBy(1L);
         question.setTitle(null);
         assertThat(createQuestion(question).getStatusCodeValue()).isEqualTo(400);
+    }
+
+    @Test
+    public void createTitleWhenCourseDoesNotExistsShouldReturn404() throws Exception {
+        Question question = questionRepository.findBy(1L);
+        question.setCourse(new Course());
+        assertThat(createQuestion(question).getStatusCodeValue()).isEqualTo(404);
     }
 
     @Test
