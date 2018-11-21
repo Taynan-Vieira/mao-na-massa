@@ -15,7 +15,8 @@ public interface CourseRepository extends CustomPagingAndSortRepository<Course, 
 
     @Transactional
     @Modifying
-    @Query("delete from Course  c where c.id = ?1 and c.professor = ?#{principal.professor}")
+    @Query("update #{#entityName} c set c.enabled=false where c.id = ?1")
+//    @Query("delete from Course  c where c.id = ?1 and c.professor = ?#{principal.professor}")
     void deleteById(Long id);
 
     @Transactional
@@ -28,4 +29,6 @@ public interface CourseRepository extends CustomPagingAndSortRepository<Course, 
 
     @Query("select c from Course c where c.dateEvent like %?1% and c.professor = ?#{principal.professor}")
     List<Course> listDateEventCourses(LocalDate dateEvent);
+
+
 }

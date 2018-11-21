@@ -21,4 +21,8 @@ public interface QuestionRepository extends CustomPagingAndSortRepository<Questi
     @Query("delete from Question q where q = ?1 and q.professor = ?#{principal.professor}")
     void delete(Question Question);
 
+    @Transactional
+    @Query("update Question q set q.enabled = false where q.course.id = ?1")
+    @Modifying
+    void deleteAllQuestionRelatedToCourse(long courseId);
 }

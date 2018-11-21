@@ -11,7 +11,7 @@ public class AbstractEntity implements Serializable  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(columnDefinition = "boolean default true", nullable = false)
+    @Column(name = "enabled")
     private boolean enabled = true;
 
     @Override
