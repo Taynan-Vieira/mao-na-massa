@@ -64,18 +64,26 @@ public class CourseEndpoint {
     @DeleteMapping(path = "{id}")
     @Transactional
     public ResponseEntity<?> delete(@PathVariable long id) {
-        service.throwResourceNotFoundIfDoesNotExist(id, courseRepository, "Course not found");
+        validateCourseExistence(id);
         questionRepository.deleteAllQuestionRelatedToCourse(id);
         courseRepository.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private void validateCourseExistence(@PathVariable long id) {
+        validateQuestionExistenceOnDB(id);
     }
 
     /********************************************/
     @ApiOperation(value = "Atualizar o curso especificado e retonar 200 Ok")
     @PutMapping
     public ResponseEntity<?> update(@RequestBody Course course) {
-        service.throwResourceNotFoundIfDoesNotExist(course, courseRepository, "Course not found");
+        validateQuestionExistenceOnDB(course.getId());
         return new ResponseEntity<>(courseRepository.save(course), HttpStatus.OK);
+    }
+
+    private void validateQuestionExistenceOnDB(Long id) {
+        service.throwResourceNotFoundIfDoesNotExist(id, courseRepository, "Course not found");
     }
 
     @ApiOperation(value = "Criar o curso especificado e retonar o curso criado")

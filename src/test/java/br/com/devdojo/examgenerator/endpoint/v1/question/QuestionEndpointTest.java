@@ -42,7 +42,7 @@ public class QuestionEndpointTest {
     private HttpEntity<Void> wrongHeader;
     private Question question = mockQuestion();
 
-    private static Question mockQuestion() {
+    public static Question mockQuestion() {
         return Question.Builder.newQuestion()
                 .id(1L)
                 .title("Qual é a classe?")

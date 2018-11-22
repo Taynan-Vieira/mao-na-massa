@@ -21,7 +21,6 @@ import javax.validation.Valid;
 public class QuestionEndpoint {
     private final QuestionRepository questionRepository;
     private final CourseRepository courseRepository;
-
     private final GenericService service;
     private EndpointUtil endpointUtil;
 
@@ -50,7 +49,7 @@ public class QuestionEndpoint {
     @ApiOperation(value = "Deletar o curso especificado e retonar 200 Ok")
     @DeleteMapping(path = "{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
-        service.throwResourceNotFoundIfDoesNotExist(id, questionRepository, "Question not found");
+        validateQuestionExistenceOnDB(id);
         questionRepository.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -59,9 +58,13 @@ public class QuestionEndpoint {
     @ApiOperation(value = "Atualizar o curso especificado e retonar 200 Ok")
     @PutMapping
     public ResponseEntity<?> update(@Valid @RequestBody Question question) {
-        service.throwResourceNotFoundIfDoesNotExist(question, questionRepository, "Question not found");
+        validateQuestionExistenceOnDB(question.getId());
         questionRepository.save(question);
         return new ResponseEntity<>(questionRepository.save(question), HttpStatus.OK);
+    }
+
+    private void validateQuestionExistenceOnDB(Long id) {
+        service.throwResourceNotFoundIfDoesNotExist(id, questionRepository, "Question not found");
     }
 
     /********************************************/
