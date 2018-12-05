@@ -1,5 +1,6 @@
 package br.com.devdojo.examgenerator.endpoint.v1.course;
 
+import br.com.devdojo.examgenerator.endpoint.v1.deleteservice.CascadeDeleteService;
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Course;
 import br.com.devdojo.examgenerator.persistence.repository.CourseRepository;
@@ -23,15 +24,17 @@ import java.time.LocalDate;
 @Api(description = "Operações relacionadas aos professores do curso")
 public class CourseEndpoint {
     private final CourseRepository courseRepository;
-        private final QuestionRepository questionRepository;
+    private final QuestionRepository questionRepository;
     private final GenericService service;
+    private final CascadeDeleteService deleteService;
     private EndpointUtil endpointUtil;
 
     @Autowired
-    public CourseEndpoint(CourseRepository courseRepository, QuestionRepository questionRepository, GenericService service, EndpointUtil endpointUtil) {
+    public CourseEndpoint(CourseRepository courseRepository, QuestionRepository questionRepository, GenericService service, CascadeDeleteService deleteService, EndpointUtil endpointUtil) {
         this.courseRepository = courseRepository;
         this.questionRepository = questionRepository;
         this.service = service;
+        this.deleteService = deleteService;
         this.endpointUtil = endpointUtil;
     }
 
@@ -60,13 +63,12 @@ public class CourseEndpoint {
         return new ResponseEntity<>(courseRepository.listCoursesByName(name), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Deletar o curso especificado e retonar 200 Ok")
+    @ApiOperation(value = "Deletar o curso especificado e todas as questões relacionada e suas alternativas retonar 200 Ok")
     @DeleteMapping(path = "{id}")
     @Transactional
     public ResponseEntity<?> delete(@PathVariable long id) {
         validateCourseExistence(id);
-        questionRepository.deleteAllQuestionRelatedToCourse(id);
-        courseRepository.deleteById(id);
+        deleteService.cascadeDeleteCourseQuestionAndChoice(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

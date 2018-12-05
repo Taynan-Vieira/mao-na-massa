@@ -1,5 +1,6 @@
 package br.com.devdojo.examgenerator.endpoint.v1.question;
 
+import br.com.devdojo.examgenerator.endpoint.v1.deleteservice.CascadeDeleteService;
 import br.com.devdojo.examgenerator.endpoint.v1.genericservice.GenericService;
 import br.com.devdojo.examgenerator.persistence.model.Question;
 import br.com.devdojo.examgenerator.persistence.repository.CourseRepository;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 @RestController
@@ -22,13 +24,15 @@ public class QuestionEndpoint {
     private final QuestionRepository questionRepository;
     private final CourseRepository courseRepository;
     private final GenericService service;
+    private CascadeDeleteService deleteService;
     private EndpointUtil endpointUtil;
 
     @Autowired
-    public QuestionEndpoint(QuestionRepository questionRepository, CourseRepository courseRepository, GenericService service, EndpointUtil endpointUtil) {
+    public QuestionEndpoint(QuestionRepository questionRepository, CourseRepository courseRepository, GenericService service, CascadeDeleteService deleteService, EndpointUtil endpointUtil) {
         this.questionRepository = questionRepository;
         this.courseRepository = courseRepository;
         this.service = service;
+        this.deleteService = deleteService;
         this.endpointUtil = endpointUtil;
     }
 
@@ -46,11 +50,12 @@ public class QuestionEndpoint {
 
     }
 
-    @ApiOperation(value = "Deletar o curso especificado e retonar 200 Ok")
+    @ApiOperation(value = "Deletar o curso especificado e todas as alternativas relacionadas e retonar 200 Ok")
     @DeleteMapping(path = "{id}")
+    @Transactional
     public ResponseEntity<?> delete(@PathVariable long id) {
         validateQuestionExistenceOnDB(id);
-        questionRepository.deleteById(id);
+        deleteService.cascadeDeleteQuestionAndChoice(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
