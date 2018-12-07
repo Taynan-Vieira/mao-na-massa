@@ -95,4 +95,8 @@ public class CourseEndpoint {
         return new ResponseEntity<>(courseRepository.save(course), HttpStatus.OK);
     }
 
+    /*private void validateCoursesQuestion(@RequestBody @Valid Course course) {
+        service.throwResourceNotFoundIfDoesNotExist(course.getName(), courseRepository, "The question related to this choice was not found");
+    }*/
+
 }

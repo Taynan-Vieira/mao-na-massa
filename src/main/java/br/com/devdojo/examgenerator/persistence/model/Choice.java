@@ -15,7 +15,7 @@ public class Choice extends AbstractEntity {
     private String title;
     @NotNull(message = "O nome campo correAnswer deve ser verdadeiro ou falso")
     @ApiModelProperty(notes = "Alternativa correta para a questão associada, você pode ter apenas uma questão correta por questão")
-//    @Column(nullable=false)
+    @Column(columnDefinition = "boolean default false", nullable = false)
     private boolean correctAnswer;
     @ManyToOne(optional = false)
     private Question question;
